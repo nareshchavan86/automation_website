@@ -3,20 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Naresh System Creation & Data Automation</title>
+<title>Infinity Automation Systems | Immersive 3D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --primary: #1a73e8;
     --primary-dark: #0d47a1;
     --accent: #00c853;
-    --dark: #1a1a2e;
-    --darker: #16213e;
-    --card-bg: #1e293b;
+    --dark: #05050a;
+    --darker: #0a0a1a;
+    --card-bg: rgba(30, 41, 59, 0.7);
     --text: #e2e8f0;
     --text-muted: #94a3b8;
     --gradient1: linear-gradient(135deg, #1a73e8, #00c853);
-    --gradient2: linear-gradient(135deg, #0d47a1, #1a73e8);
   }
   html { scroll-behavior: smooth; font-size: 16px; }
   body {
@@ -28,434 +27,164 @@
     overflow-x: hidden;
   }
 
+  /* ===== 3D CANVAS CONTAINER ===== */
+  #canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
   /* ===== NAV ===== */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    background: rgba(26,26,46,0.97);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(10, 10, 26, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
     padding: 0 clamp(1rem, 4vw, 2rem);
     display: flex; align-items: center; justify-content: space-between;
     height: 64px;
-    transition: box-shadow 0.3s;
   }
-  nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.4); }
-  .nav-brand {
-    display: flex; align-items: center; gap: 10px; text-decoration: none;
-    flex-shrink: 0; min-width: 0;
-  }
-  .nav-brand img {
-    height: clamp(32px, 5vw, 44px);
-    width: auto; border-radius: 8px; object-fit: contain; flex-shrink: 0;
-  }
-  .nav-brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-brand img { height: 40px; width: auto; border-radius: 8px; }
   .brand-name {
-    font-weight: 700; font-size: clamp(0.75rem, 2vw, 1rem);
+    font-weight: 700; font-size: 1rem;
     background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .brand-sub {
-    font-size: clamp(0.55rem, 1.2vw, 0.65rem);
-    color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;
-  }
-  .nav-links { display: flex; gap: clamp(0.75rem, 2vw, 1.5rem); list-style: none; }
-  .nav-links a {
-    color: var(--text-muted); text-decoration: none;
-    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-    transition: color 0.3s; position: relative; white-space: nowrap;
-  }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
   .nav-links a:hover { color: #fff; }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
-    background: var(--gradient1); transition: width 0.3s;
-  }
-  .nav-links a:hover::after { width: 100%; }
-  .hamburger {
-    display: none; flex-direction: column; gap: 5px;
-    cursor: pointer; background: none; border: none; padding: 5px;
-    flex-shrink: 0;
-  }
-  .hamburger span { width: 24px; height: 2px; background: #fff; transition: 0.3s; display: block; }
-  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .hamburger.open span:nth-child(2) { opacity: 0; }
-  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  /* Mobile Nav */
-  @media (max-width: 768px) {
-    .nav-links {
-      display: none; position: fixed;
-      top: 64px; left: 0; right: 0;
-      background: rgba(26,26,46,0.99);
-      flex-direction: column; padding: 1.5rem 2rem;
-      gap: 0; border-bottom: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-    }
-    .nav-links.open { display: flex; }
-    .nav-links li { border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .nav-links a { display: block; padding: 0.85rem 0; font-size: 1rem; }
-    .nav-links a::after { display: none; }
-    .hamburger { display: flex; }
-    .brand-sub { display: none; }
-  }
 
   /* ===== HERO ===== */
   .hero {
-  min-height: 100svh;
-  display: flex; align-items: center; justify-content: center;
-  text-align: center; 
-  padding: clamp(80px, 12vh, 120px) clamp(1rem, 5vw, 2rem) clamp(2rem, 5vh, 4rem);
-  /* Updated to use the variable for a cyan/blue glow */
-  background: radial-gradient(ellipse at 50% 0%, rgba(var(--glow-rgb), 0.15) 0%, transparent 60%);
-  position: relative;
-}
-
-.hero-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-
-.particle {
-  position: absolute; border-radius: 50%; opacity: 0.15;
-  background-color: var(--color-cyan); /* Added color to particles */
-  animation: float linear infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(100vh) scale(0); opacity: 0; }
-  10% { opacity: 0.15; } 90% { opacity: 0.15; }
-  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-}
-
-.hero-content { max-width: min(800px, 95vw); position: relative; z-index: 1; width: 100%; }
-
-.hero-logo {
-  width: clamp(100px, 30vw, 220px);
-  height: clamp(100px, 30vw, 220px);
-  border-radius: 30px; /* Slightly increased to match your image's rounded square */
-  margin: 0 auto 1.5rem;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden; 
-  background: var(--bg-card); /* Matches the dark box behind the logo in your image */
-  box-shadow: 0 8px 40px rgba(var(--glow-rgb), 0.2);
-  animation: pulse 3s ease-in-out infinite;
-}
-
-.hero-logo img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 8px 40px rgba(var(--glow-rgb), 0.2); }
-  50% { box-shadow: 0 8px 60px rgba(var(--glow-rgb), 0.4); }
-}
-
-.hero-tagline {
-  color: var(--text-muted); 
-  font-size: clamp(0.7rem, 2vw, 1rem);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.75rem; font-weight: 500;
-}
-
-.hero h1 {
-  font-size: clamp(1.6rem, 5vw, 3.2rem); font-weight: 800;
-  line-height: 1.2; margin-bottom: 1rem;
-}
-
-.hero h1 .highlight {
-  background: var(--gradient1); 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero p {
-  color: var(--text-muted); 
-  font-size: clamp(0.9rem, 2vw, 1.15rem);
-  line-height: 1.7; margin-bottom: 2rem;
-  max-width: min(600px, 90vw); margin-left: auto; margin-right: auto;
-}
-
-.hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-  /* ===== BUTTONS ===== */
-  .btn {
-    padding: clamp(10px, 2vw, 13px) clamp(18px, 4vw, 28px);
-    border-radius: 50px; font-size: clamp(0.85rem, 2vw, 0.95rem);
-    font-weight: 600; text-decoration: none; cursor: pointer;
-    border: none; transition: 0.3s; display: inline-block; text-align: center;
+    height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 0 2rem;
   }
-  .btn-primary {
-    background: var(--gradient1); color: #fff;
-    box-shadow: 0 4px 20px rgba(26,115,232,0.3);
+  .hero-content { 
+    max-width: 800px; 
+    z-index: 10;
+    animation: fadeIn 1.5s ease-out;
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(26,115,232,0.5); }
-  .btn-outline {
-    background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.2);
-  }
-  .btn-outline:hover { border-color: var(--primary); background: rgba(26,115,232,0.1); }
+  .hero h1 { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+  .hero h1 .highlight { background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px; margin-inline: auto; }
 
-  /* ===== SECTIONS ===== */
-  section { padding: clamp(3rem, 8vw, 5rem) clamp(1rem, 5vw, 2rem); }
-  .section-header { text-align: center; margin-bottom: clamp(1.5rem, 4vw, 3rem); }
-  .section-header h2 {
-    font-size: clamp(1.4rem, 3.5vw, 2.2rem); font-weight: 700; margin-bottom: 0.75rem;
+  /* ===== GLASS CARD STYLE ===== */
+  .glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 24px;
+    transition: 0.3s ease;
   }
-  .section-header p { color: var(--text-muted); max-width: min(600px, 90vw); margin: 0 auto; font-size: clamp(0.85rem, 2vw, 1rem); }
-  .section-label {
-    display: inline-block; padding: 6px 16px; border-radius: 50px;
-    font-size: clamp(0.7rem, 1.5vw, 0.8rem); font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;
-    background: rgba(26,115,232,0.15); color: var(--primary);
+
+  /* ===== COMMON SECTION LAYOUT ===== */
+  section { 
+    padding: clamp(4rem, 10vw, 8rem) 2rem; 
+    display: flex; flex-direction: column; align-items: center; 
   }
+  .section-header { text-align: center; margin-bottom: 4rem; }
+  .section-label { display: inline-block; padding: 6px 16px; border-radius: 50px; background: rgba(26,115,232,0.1); color: var(--primary); font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; }
+  .section-header h2 { font-size: 2.5rem; margin-bottom: 1rem; }
 
   /* ===== STATS ===== */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: clamp(1rem, 3vw, 1.5rem);
-    max-width: min(900px, 95vw); margin: 0 auto;
-    text-align: center; padding: clamp(2rem, 5vw, 3rem) 0;
+  .stats-bar { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 2rem; width: 100%; max-width: 1100px; 
   }
-  @media (max-width: 600px) {
-    .stats-bar { grid-template-columns: repeat(2, 1fr); }
-  }
-  .stat h3 {
-    font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 800;
-    background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .stat p { color: var(--text-muted); font-size: clamp(0.75rem, 1.5vw, 0.9rem); margin-top: 0.25rem; }
+  .stat { text-align: center; padding: 2rem; }
+  .stat h3 { font-size: 3rem; background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
   /* ===== SERVICES ===== */
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-    gap: clamp(1rem, 2.5vw, 1.5rem);
-    max-width: min(1200px, 95vw); margin: 0 auto;
+  .services-grid { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 2rem; width: 100%; max-width: 1200px; 
   }
-  .service-card {
-    background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 16px; padding: clamp(1.25rem, 3vw, 2rem);
-    transition: 0.3s; position: relative; overflow: hidden;
-  }
-  .service-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: var(--gradient1); opacity: 0; transition: opacity 0.3s;
-  }
-  .service-card:hover { transform: translateY(-4px); border-color: rgba(26,115,232,0.3); }
-  .service-card:hover::before { opacity: 1; }
-  .service-icon { font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 1rem; display: block; }
-  .service-card h3 { font-size: clamp(0.95rem, 2vw, 1.1rem); margin-bottom: 0.5rem; }
-  .service-card p { color: var(--text-muted); font-size: clamp(0.8rem, 1.5vw, 0.9rem); line-height: 1.6; }
+  .service-card { padding: 2.5rem; }
+  .service-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  .service-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
 
   /* ===== PROJECTS ===== */
-  .projects-section { background: var(--darker); }
-  .filter-bar {
-    display: flex; gap: clamp(0.4rem, 1vw, 0.5rem);
-    justify-content: center; flex-wrap: wrap;
-    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  .filter-bar { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+  .filter-btn { 
+    padding: 8px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); 
+    background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.3s; 
   }
-  .filter-btn {
-    padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 20px);
-    border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
-    background: transparent; color: var(--text-muted); cursor: pointer;
-    font-size: clamp(0.75rem, 1.5vw, 0.85rem); transition: 0.3s;
-    white-space: nowrap;
+  .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+  
+  .projects-grid { 
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 2rem; width: 100%; max-width: 1200px; 
   }
-  .filter-btn.active, .filter-btn:hover {
-    background: var(--primary); color: #fff; border-color: var(--primary);
+  .project-card { overflow: hidden; cursor: pointer; }
+  .project-thumb { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; }
+  .play-icon { 
+    position: absolute; width: 50px; height: 50px; background: white; border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; 
   }
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-    gap: clamp(1rem, 2.5vw, 1.5rem);
-    max-width: min(1200px, 95vw); margin: 0 auto;
-  }
-  .project-card {
-    background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 16px; overflow: hidden; transition: 0.3s; cursor: pointer;
-  }
-  .project-card:hover { transform: translateY(-4px); border-color: rgba(26,115,232,0.2); }
-  .project-card.hidden { display: none; }
-  .project-thumb {
-    height: clamp(140px, 20vw, 180px);
-    display: flex; align-items: center; justify-content: center;
-    font-size: clamp(2.5rem, 6vw, 4rem); position: relative; overflow: hidden;
-  }
-  .project-thumb::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(transparent 50%, var(--card-bg));
-  }
-  .play-icon {
-    position: absolute; width: clamp(44px, 8vw, 60px); height: clamp(44px, 8vw, 60px);
-    background: rgba(255,255,255,0.9); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2; opacity: 0; transform: scale(0.8); transition: all 0.3s ease;
-  }
-  .play-icon::before {
-    content: '▶'; color: var(--primary);
-    font-size: clamp(16px, 3vw, 24px); margin-left: 4px;
-  }
-  .project-card:hover .play-icon { opacity: 1; transform: scale(1); }
-  .project-body { padding: clamp(1rem, 3vw, 1.5rem); }
-  .project-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-  .tag {
-    padding: 3px 10px; border-radius: 50px; font-size: clamp(0.65rem, 1.2vw, 0.7rem);
-    font-weight: 600; background: rgba(26,115,232,0.15); color: var(--primary);
-  }
-  .project-body h3 { font-size: clamp(0.9rem, 2vw, 1.05rem); margin-bottom: 0.5rem; }
-  .project-body p { color: var(--text-muted); font-size: clamp(0.78rem, 1.5vw, 0.85rem); line-height: 1.6; }
+  .project-card:hover .play-icon { opacity: 1; transform: scale(1.1); }
+  .project-body { padding: 1.5rem; }
 
   /* ===== VIDEO MODAL ===== */
   .video-modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    padding: clamp(0.5rem, 3vw, 1.5rem);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; 
+    display: none; align-items: center; justify-content: center; padding: 2rem;
   }
-  .video-modal.active { opacity: 1; visibility: visible; }
-  .video-modal-content {
-    width: 100%; max-width: min(900px, 95vw);
-    background: var(--card-bg); border-radius: 16px; overflow: hidden;
-    transform: scale(0.9); transition: transform 0.3s ease;
-    max-height: 90svh; display: flex; flex-direction: column;
-  }
-  .video-modal.active .video-modal-content { transform: scale(1); }
-  .video-modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
-    border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
-  }
-  .video-modal-header h3 { font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 600; }
-  .video-modal-close {
-    width: 36px; height: 36px; border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; flex-shrink: 0;
-  }
-  .video-modal-close:hover { background: rgba(255,255,255,0.2); }
-  .video-container {
-    position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
-  }
-  .video-container iframe, .video-container video {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-  }
-  .video-info { padding: clamp(0.75rem, 2vw, 1.5rem); flex-shrink: 0; }
-  .video-info p { color: var(--text-muted); font-size: clamp(0.8rem, 1.5vw, 0.9rem); line-height: 1.6; }
-
-  /* ===== ABOUT ===== */
-  .about-wrapper { max-width: min(1000px, 95vw); margin: 0 auto; }
-  .about-content {
-    display: grid; gap: clamp(1.5rem, 4vw, 2rem);
-    grid-template-columns: 1fr 1fr; align-items: center;
-  }
-  @media (max-width: 700px) {
-    .about-content { grid-template-columns: 1fr; }
-  }
-  .about-text p {
-    color: var(--text-muted); line-height: 1.8;
-    font-size: clamp(0.85rem, 2vw, 0.95rem); margin-bottom: 1rem;
-  }
-  .about-visual { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.75rem, 2vw, 1rem); }
-  .about-stat-card {
-    background: var(--card-bg); border-radius: 12px;
-    padding: clamp(1rem, 2.5vw, 1.25rem); text-align: center;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  .about-stat-card .icon { font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: 0.5rem; }
-  .about-stat-card h4 { font-size: clamp(0.75rem, 1.5vw, 0.85rem); color: var(--text-muted); }
+  .video-modal.active { display: flex; }
+  .video-modal-content { width: 100%; max-width: 900px; background: var(--card-bg); border-radius: 20px; overflow: hidden; }
+  .video-container { position: relative; padding-bottom: 56.25%; height: 0; }
+  .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  .video-modal-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+  .video-modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
 
   /* ===== CONTACT ===== */
-  .contact-section { background: var(--darker); }
-  .contact-grid {
-    max-width: min(900px, 95vw); margin: 0 auto;
-    display: grid; grid-template-columns: 1fr 1.2fr;
-    gap: clamp(1.5rem, 5vw, 3rem);
-  }
-  @media (max-width: 700px) {
-    .contact-grid { grid-template-columns: 1fr; }
-  }
-  .contact-info { display: flex; flex-direction: column; gap: clamp(1rem, 3vw, 1.5rem); }
-  .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
-  .contact-item .ci-icon {
-    width: clamp(38px, 6vw, 44px); height: clamp(38px, 6vw, 44px);
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-size: clamp(1rem, 2.5vw, 1.2rem); background: rgba(26,115,232,0.15); flex-shrink: 0;
-  }
-  .contact-item h4 { font-size: clamp(0.85rem, 1.8vw, 0.9rem); margin-bottom: 2px; }
-  .contact-item p { color: var(--text-muted); font-size: clamp(0.8rem, 1.5vw, 0.85rem); }
-  .contact-form {
-    display: flex; flex-direction: column; gap: clamp(0.75rem, 2vw, 1rem);
-    background: rgba(30,41,59,0.5); padding: clamp(1.25rem, 4vw, 2rem);
-    border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
-  }
-  .contact-form input, .contact-form textarea {
-    padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 18px);
-    border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(26,26,46,0.8); color: #fff;
-    font-size: clamp(0.85rem, 2vw, 0.95rem); font-family: inherit;
-    resize: vertical; transition: all 0.3s ease; width: 100%;
-  }
-  .contact-form input:focus, .contact-form textarea:focus {
-    outline: none; border-color: var(--primary); background: rgba(26,26,46,1);
-  }
-  .contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--text-muted); }
-  .form-status {
-    padding: 12px 16px; border-radius: 10px; font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-    display: none; align-items: center; gap: 8px;
-  }
-  .form-status.success { display: flex; background: rgba(0,200,83,0.15); color: #00c853; border: 1px solid rgba(0,200,83,0.3); }
-  .form-status.error { display: flex; background: rgba(244,67,54,0.15); color: #f44336; border: 1px solid rgba(244,67,54,0.3); }
-  .form-status.loading { display: flex; background: rgba(26,115,232,0.15); color: var(--primary); border: 1px solid rgba(26,115,232,0.3); }
-  .spinner {
-    width: 16px; height: 16px; border: 2px solid currentColor;
-    border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ===== FOOTER ===== */
-  footer {
-    text-align: center; padding: clamp(1.25rem, 4vw, 2rem);
-    border-top: 1px solid rgba(255,255,255,0.05);
-    color: var(--text-muted); font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; width: 100%; max-width: 1100px; }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; padding: 2rem; }
+  .contact-form input, .contact-form textarea { 
+    padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
+    background: rgba(15, 23, 42, 0.8); color: white; font-family: inherit; 
   }
 
-  /* ===== SCROLL ANIMATION ===== */
-  .reveal { opacity: 0; transform: translateY(30px); transition: 0.6s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+  /* ===== BUTTONS ===== */
+  .btn { padding: 12px 30px; border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s; display: inline-block; cursor: pointer; }
+  .btn-primary { background: var(--gradient1); color: #fff; box-shadow: 0 4px 15px rgba(26,115,232,0.4); border: none; }
+  .btn-outline { border: 2px solid rgba(255,255,255,0.2); color: #fff; }
+  .btn:hover { transform: translateY(-3px); opacity: 0.9; }
 
-  /* ===== TOUCH DEVICES - show play icon always ===== */
-  @media (hover: none) {
-    .play-icon { opacity: 1; transform: scale(1); }
-  }
+  footer { text-align: center; padding: 4rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } .nav-links { display: none; } }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<div id="canvas-container"></div>
+
 <nav id="navbar">
   <a class="nav-brand" href="#hero">
-    <img src="https://i.postimg.cc/dVZ3d1nB/processed-image.png" alt="Infinity Automation Systems Logo">
-    <div class="nav-brand-text">
-      <span class="brand-name">Infinity Automation Systems</span>
-      
-    </div>
+    <img src="https://i.postimg.cc/dVZ3d1nB/processed-image.png" alt="Logo">
+    <span class="brand-name">Infinity Automation</span>
   </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#services" onclick="closeNav()">Services</a></li>
-    <li><a href="#projects" onclick="closeNav()">Projects</a></li>
-    <li><a href="#about" onclick="closeNav()">About</a></li>
-    <li><a href="#contact" onclick="closeNav()">Contact</a></li>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
-  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </nav>
 
-<!-- HERO -->
 <section class="hero" id="hero">
-  <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <div class="hero-logo">
-      <img src="https://i.postimg.cc/dVZ3d1nB/processed-image.png" alt="Infinity Automation Systems Logo">
-    </div>
-    <p class="hero-tagline">Smart Automation. Powerful Systems.</p>
-    <h1>Infinity Automation Systems</h1>
-    <p>We transform raw data into powerful insights. Expert solutions in spreadsheets, dashboards, automation scripts, and business intelligence tools.</p>
+    <!-- Middle Logo Removed -->
+    <h1>Infinity <span class="highlight">Automation</span> Systems</h1>
+    <p>We transform raw data into powerful insights. Expert solutions in spreadsheets, dashboards, and business intelligence tools.</p>
     <div class="hero-btns">
       <a href="#projects" class="btn btn-primary">View Projects</a>
       <a href="#contact" class="btn btn-outline">Get In Touch</a>
@@ -463,435 +192,232 @@
   </div>
 </section>
 
-<!-- STATS -->
 <section>
   <div class="stats-bar">
-    <div class="stat reveal"><h3 id="stat1">0</h3><p>Projects Delivered</p></div>
-    <div class="stat reveal"><h3 id="stat2">0</h3><p>Happy Clients</p></div>
-    <div class="stat reveal"><h3 id="stat3">0</h3><p>Automations Built</p></div>
-    <div class="stat reveal"><h3 id="stat4">0</h3><p>Dashboards Created</p></div>
+    <div class="stat glass-card"><h3>15+</h3><p>Projects Delivered</p></div>
+    <div class="stat glass-card"><h3>50+</h3><p>Automations Built</p></div>
+    <div class="stat glass-card"><h3>70+</h3><p>Dashboards Created</p></div>
+    <div class="stat glass-card"><h3>100%</h3><p>Client Satisfaction</p></div>
   </div>
 </section>
 
-<!-- SERVICES -->
 <section id="services">
   <div class="section-header">
     <span class="section-label">What We Do</span>
     <h2>Our Core Services</h2>
-    <p>End-to-end data solutions from automation to visualization</p>
   </div>
   <div class="services-grid">
-    <div class="service-card reveal">
+    <div class="service-card glass-card">
       <span class="service-icon">📊</span>
       <h3>Google Sheets & Apps Script</h3>
-      <p>I build a centralized Google Sheets system that automatically updates, organizes, and tracks your data in real time. It reduces manual work and gives you instant visibility.</p>
+      <p>Centralized systems that automatically update and organize data in real time.</p>
     </div>
-    <div class="service-card reveal">
-      <span class="service-icon">📝</span>
-      <h3>Google Docs Automation</h3>
-      <p>Automated document generation, mail merge, template systems, and document workflow solutions.</p>
-    </div>
-    <div class="service-card reveal">
-      <span class="service-icon">📗</span>
-      <h3>Excel & VBA Solutions</h3>
-      <p>Advanced Excel dashboards, macros, VBA automation, and complex formula-driven reporting systems.</p>
-    </div>
-    <div class="service-card reveal">
+    <div class="service-card glass-card">
       <span class="service-icon">📈</span>
       <h3>Power BI Dashboards</h3>
-      <p>Interactive business intelligence dashboards with DAX measures and real-time data connectivity.</p>
+      <p>Interactive BI reports with DAX measures and real-time connectivity.</p>
     </div>
-    <div class="service-card reveal">
-      <span class="service-icon">🔄</span>
-      <h3>Power Query & ETL</h3>
-      <p>Data transformation pipelines, cleaning workflows, and ETL processes using Power Query M language.</p>
-    </div>
-    <div class="service-card reveal">
-      <span class="service-icon">📉</span>
-      <h3>Tableau Visualizations</h3>
-      <p>Stunning interactive visualizations and analytical dashboards built with Tableau Desktop & Server.</p>
-    </div>
-    <div class="service-card reveal">
-      <span class="service-icon">🔍</span>
-      <h3>Looker Studio Reports</h3>
-      <p>Connected dashboards pulling from multiple data sources with dynamic filtering and sharing capabilities.</p>
-    </div>
-    <div class="service-card reveal">
+    <div class="service-card glass-card">
       <span class="service-icon">⚙️</span>
-      <h3>Custom Data Automation</h3>
-      <p>End-to-end automation of data collection, processing, analysis, and reporting tailored to your needs.</p>
+      <h3>Custom Automation</h3>
+      <p>End-to-end ETL pipelines and custom reporting workflows.</p>
+    </div>
+    <div class="service-card glass-card">
+      <span class="service-icon">📝</span>
+      <h3>Google Docs Automation</h3>
+      <p>Automated document generation and branded template systems.</p>
     </div>
   </div>
 </section>
 
-<!-- PROJECTS -->
 <section class="projects-section" id="projects">
   <div class="section-header">
     <span class="section-label">Portfolio</span>
     <h2>Featured Projects</h2>
-    <p>Click any project to watch the demo video</p>
   </div>
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterProjects('all', this)">All</button>
     <button class="filter-btn" onclick="filterProjects('sheets', this)">Google Sheets</button>
-    <button class="filter-btn" onclick="filterProjects('docs', this)">Google Docs</button>
-    <button class="filter-btn" onclick="filterProjects('excel', this)">Excel</button>
     <button class="filter-btn" onclick="filterProjects('powerbi', this)">Power BI</button>
-    <button class="filter-btn" onclick="filterProjects('tableau', this)">Tableau</button>
-    <button class="filter-btn" onclick="filterProjects('looker', this)">Looker Studio</button>
+    <button class="filter-btn" onclick="filterProjects('excel', this)">Excel</button>
   </div>
   <div class="projects-grid" id="projectsGrid">
-
-    <div class="project-card reveal" data-cat="sheets" onclick="openVideoModal('Google Calendar Event Automation','Automated Google Calendar event creation with email notifications','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#0f9d58,#34a853);">📊<div class="play-icon"></div></div>
+    <!-- Project 1 -->
+    <div class="project-card glass-card" data-cat="sheets" onclick="openVideoModal('Calendar Automation','Automated event creation','https://www.youtube.com/embed/dQw4w9WgXcQ')">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0f9d58,#34a853);">📊<div class="play-icon">▶</div></div>
       <div class="project-body">
-        <div class="project-tags"><span class="tag">Google Sheets</span><span class="tag">Apps Script</span></div>
-        <h3>Google Calendar Event Creation</h3>
-        <p>Automatic scheduling of events in Google Calendar along with sending emails like invites, reminders, or updates, reducing manual work and improving efficiency.</p>
+        <h3>Google Calendar Automation</h3>
+        <p>Automatic scheduling and email invites from Sheets data.</p>
       </div>
     </div>
-
-    <div class="project-card reveal" data-cat="sheets" onclick="openVideoModal('CRM & Sales Pipeline','Complete CRM built in Google Sheets with automated follow-ups and lead scoring','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#0f9d58,#1a73e8);">📋<div class="play-icon"></div></div>
+    <!-- Project 2 -->
+    <div class="project-card glass-card" data-cat="powerbi" onclick="openVideoModal('E-Commerce Sales','Interactive Power BI report','https://www.youtube.com/embed/dQw4w9WgXcQ')">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#f2c811,#e8a500);">📈<div class="play-icon">▶</div></div>
       <div class="project-body">
-        <div class="project-tags"><span class="tag">Google Sheets</span><span class="tag">Automation</span></div>
-        <h3>CRM & Sales Pipeline</h3>
-        <p>Custom CRM built entirely in Google Sheets with automated follow-ups, lead scoring, and performance reports.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="docs" onclick="openVideoModal('Invoice Generator System','Automated invoice generation from spreadsheet data with branded templates','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#4285f4,#7baaf7);">📝<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Google Docs</span><span class="tag">Apps Script</span></div>
-        <h3>Invoice Generator System</h3>
-        <p>Automated invoice and proposal generation from Sheets data with branded templates and PDF delivery.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="excel" onclick="openVideoModal('Financial Reporting Dashboard','Excel dashboard with VBA macros for automated financial reporting','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#217346,#33a867);">📗<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Excel</span><span class="tag">VBA</span></div>
-        <h3>Financial Reporting Dashboard</h3>
-        <p>Multi-sheet financial model with VBA macros for automated P&L, balance sheet, and cash flow reporting.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="excel" onclick="openVideoModal('HR Analytics Workbook','Power Query ETL for employee data consolidation and analysis','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#217346,#185c37);">🔄<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Excel</span><span class="tag">Power Query</span></div>
-        <h3>HR Analytics Workbook</h3>
-        <p>Employee data consolidation with Power Query ETL, attendance tracking, and attrition analysis dashboards.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="powerbi" onclick="openVideoModal('E-Commerce Sales Dashboard','Interactive Power BI report with drill-through and custom DAX measures','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#f2c811,#e8a500);">📈<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Power BI</span><span class="tag">DAX</span></div>
         <h3>E-Commerce Sales Dashboard</h3>
-        <p>Interactive Power BI report with drill-through pages, custom DAX measures, and RLS for multi-store views.</p>
+        <p>High-level sales tracking with deep-dive drill-throughs.</p>
       </div>
     </div>
-
-    <div class="project-card reveal" data-cat="powerbi" onclick="openVideoModal('Manufacturing KPI Tracker','Real-time production efficiency monitoring with OEE calculations','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#f2c811,#ff6f00);">🏭<div class="play-icon"></div></div>
+    <!-- Project 3 -->
+    <div class="project-card glass-card" data-cat="excel" onclick="openVideoModal('Financial Model','VBA based financial reporting','https://www.youtube.com/embed/dQw4w9WgXcQ')">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#217346,#33a867);">📗<div class="play-icon">▶</div></div>
       <div class="project-body">
-        <div class="project-tags"><span class="tag">Power BI</span><span class="tag">Power Query</span></div>
-        <h3>Manufacturing KPI Tracker</h3>
-        <p>Production efficiency monitoring with real-time data refresh, defect analysis, and OEE calculations.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="tableau" onclick="openVideoModal('Marketing Campaign Analytics','Multi-channel marketing performance with attribution modeling','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#e97627,#c72b5c);">📉<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Tableau</span><span class="tag">Visualization</span></div>
-        <h3>Marketing Campaign Analytics</h3>
-        <p>Multi-channel marketing performance dashboard with attribution modeling and ROI trend analysis.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="tableau" onclick="openVideoModal('Regional Sales Heatmap','Geographic visualization with drill-down capabilities','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#c72b5c,#5c2d91);">🗺️<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Tableau</span><span class="tag">Geospatial</span></div>
-        <h3>Regional Sales Heatmap</h3>
-        <p>Geographic visualization of sales territories with drill-down capabilities and territory performance comparisons.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="looker" onclick="openVideoModal('Website Analytics Dashboard','GA4 and Search Console integrated reporting','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#4285f4,#0d47a1);">🔍<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Looker Studio</span><span class="tag">BigQuery</span></div>
-        <h3>Website Analytics Dashboard</h3>
-        <p>Comprehensive GA4 and Search Console report with custom metrics, funnel visualization, and cohort analysis.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="looker" onclick="openVideoModal('Social Media Command Center','Unified social media reporting from multiple APIs','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#4285f4,#00c853);">📊<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Looker Studio</span><span class="tag">Multi-Source</span></div>
-        <h3>Social Media Command Center</h3>
-        <p>Unified social media reporting pulling from multiple APIs with engagement trends and content performance scoring.</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal" data-cat="sheets" onclick="openVideoModal('Project Management Suite','Full project tracker with Gantt charts and automated status emails','https://www.youtube.com/embed/dQw4w9WgXcQ')">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#0f9d58,#00c853);">⚡<div class="play-icon"></div></div>
-      <div class="project-body">
-        <div class="project-tags"><span class="tag">Google Sheets</span><span class="tag">Apps Script</span></div>
-        <h3>Project Management Suite</h3>
-        <p>Full project tracker with Gantt charts, resource allocation, automated status emails, and time logging.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- VIDEO MODAL -->
-<div class="video-modal" id="videoModal" onclick="closeVideoModalOnBackdrop(event)">
-  <div class="video-modal-content" onclick="event.stopPropagation()">
-    <div class="video-modal-header">
-      <h3 id="videoTitle">Project Title</h3>
-      <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
-    </div>
-    <div class="video-container" id="videoContainer"></div>
-    <div class="video-info"><p id="videoDescription"></p></div>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-header">
-    <span class="section-label">About Us</span>
-    <h2>Why Infinity Automation Systems Creation?</h2>
-  </div>
-  <div class="about-wrapper">
-    <div class="about-content">
-      <div class="about-text reveal">
-        <p>We are a specialized team focused on data automation and business intelligence. With deep expertise across Google Workspace, Microsoft ecosystem, and leading BI platforms, we deliver solutions that save time and drive decisions.</p>
-        <p>From simple spreadsheet automations to enterprise-level dashboards, every project is crafted with precision, performance, and scalability in mind.</p>
-        <a href="#contact" class="btn btn-primary" style="margin-top:0.5rem;">Work With Us</a>
-      </div>
-      <div class="about-visual reveal">
-        <div class="about-stat-card"><div class="icon">🚀</div><h4>Fast Delivery</h4></div>
-        <div class="about-stat-card"><div class="icon">🎯</div><h4>Precision Focused</h4></div>
-        <div class="about-stat-card"><div class="icon">🔒</div><h4>Data Security</h4></div>
-        <div class="about-stat-card"><div class="icon">💡</div><h4>Smart Solutions</h4></div>
+        <h3>Financial Reporting Model</h3>
+        <p>Automated P&L and Cash Flow reports using VBA Macros.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CONTACT -->
-<section class="contact-section" id="contact">
+<section id="contact">
   <div class="section-header">
-    <span class="section-label">Get In Touch</span>
     <h2>Start Your Project</h2>
-    <p>Ready to automate your data workflows? Let's talk.</p>
   </div>
   <div class="contact-grid">
-    <div class="contact-info reveal">
-      <div class="contact-item">
-        <div class="ci-icon">📧</div>
-        <div><h4>Email</h4><p>nareshchavan86@gmail.com</p></div>
-      </div>
-      <div class="contact-item">
-        <div class="ci-icon">📱</div>
-        <div><h4>Phone</h4><p>+91 98924 02110</p></div>
-      </div>
-      <div class="contact-item">
-        <div class="ci-icon">📍</div>
-        <div><h4>Location</h4><p>Mumbai,India</p></div>
-      </div>
-      <div class="contact-item">
-        <div class="ci-icon">⏰</div>
-        <div><h4>Response Time</h4><p>Within 24 hours</p></div>
-      </div>
+    <div class="contact-info glass-card" style="padding: 2rem;">
+      <h3>Let's Connect</h3>
+      <p style="margin: 1rem 0;">📧 nareshchavan86@gmail.com</p>
+      <p style="margin: 1rem 0;">📱 +91 98924 02110</p>
+      <p style="margin: 1rem 0;">📍 Mumbai, India</p>
     </div>
-    <form class="contact-form reveal" id="contactForm" onsubmit="submitToGoogleSheets(event)">
-      <input type="text" name="name" id="formName" placeholder="Your Name" required>
-      <input type="email" name="email" id="formEmail" placeholder="Your Email" required>
-      <input type="text" name="projectType" id="formProjectType" placeholder="Project Type (e.g., Power BI Dashboard)">
-      <textarea name="message" id="formMessage" rows="4" placeholder="Tell us about your project..." required></textarea>
-      <div class="form-status" id="formStatus">
-        <span class="spinner" id="formSpinner" style="display:none;"></span>
-        <span id="formStatusText"></span>
-      </div>
+    <form class="contact-form glass-card" id="contactForm" onsubmit="submitToGoogleSheets(event)">
+      <input type="text" id="formName" placeholder="Your Name" required>
+      <input type="email" id="formEmail" placeholder="Your Email" required>
+      <textarea id="formMessage" rows="4" placeholder="Project Details" required></textarea>
       <button type="submit" class="btn btn-primary" id="submitBtn">Send Message 🚀</button>
     </form>
   </div>
 </section>
 
-<!-- FOOTER -->
+<div class="video-modal" id="videoModal" onclick="closeVideoModal()">
+  <div class="video-modal-content" onclick="event.stopPropagation()">
+    <div class="video-modal-header">
+      <h3 id="videoTitle">Project</h3>
+      <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+    </div>
+    <div class="video-container" id="videoContainer"></div>
+  </div>
+</div>
+
 <footer>
-  <p>© 2026 Infinity Automation Systems. All rights reserved. ⚡</p>
+  <p>© 2026 Infinity Automation Systems. All rights reserved.</p>
 </footer>
 
-<script>
-  // ── CONFIG ──────────────────────────────────────────
-  const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx1bbphT9EwJdWqPlrC4TgpBxEgkk2vHKQoBZ78FG_Ww-rjCSecmeOTbk85vuH73kyX/exec';
+<!-- THREE.JS ENGINE -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  }
+</script>
 
-  // ── NAV ─────────────────────────────────────────────
-  function toggleNav() {
-    const nav = document.getElementById('navLinks');
-    const ham = document.getElementById('hamburger');
-    nav.classList.toggle('open');
-    ham.classList.toggle('open');
-  }
-  function closeNav() {
-    document.getElementById('navLinks').classList.remove('open');
-    document.getElementById('hamburger').classList.remove('open');
-  }
-  window.addEventListener('scroll', () => {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+<script type="module">
+  import * as THREE from 'three';
+
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+  const material = new THREE.MeshStandardMaterial({ 
+    color: 0x1a73e8, 
+    wireframe: true, 
+    emissive: 0x00c853, 
+    emissiveIntensity: 0.5 
+  });
+  const knot = new THREE.Mesh(geometry, material);
+  scene.add(knot);
+
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 3000;
+  const starPos = new Float32Array(starCount * 3);
+  for(let i=0; i<starCount*3; i++) starPos[i] = (Math.random()-0.5)*150;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({ size: 0.1, color: 0xffffff });
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+
+  const light = new THREE.PointLight(0xffffff, 100);
+  light.position.set(20, 20, 20);
+  scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
+
+  camera.position.z = 30;
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth) - 0.5;
+    mouseY = (e.clientY / window.innerHeight) - 0.5;
   });
 
-  // ── PARTICLES ────────────────────────────────────────
-  const particlesEl = document.getElementById('particles');
-  const colors = ['#1a73e8','#00c853','#f2c811','#e97627','#c72b5c'];
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 6 + 3;
-    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[i%colors.length]};animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*5}s;`;
-    particlesEl.appendChild(p);
-  }
+  const animate = () => {
+    requestAnimationFrame(animate);
+    knot.rotation.x += 0.005;
+    knot.rotation.y += 0.005;
+    const scrollY = window.scrollY;
+    knot.position.y = -scrollY * 0.02; 
+    knot.rotation.z = scrollY * 0.001;
+    camera.position.z = 30 + (scrollY * 0.01);
+    knot.rotation.x += mouseY * 0.05;
+    knot.rotation.y += mouseX * 0.05;
+    stars.rotation.y += 0.0005;
+    renderer.render(scene, camera);
+  };
 
-  // ── SCROLL REVEAL ────────────────────────────────────
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.08 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
-  // ── COUNTERS ─────────────────────────────────────────
-  function animateCounter(id, target) {
-    let current = 0;
-    const step = Math.ceil(target / 60);
-    const el = document.getElementById(id);
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) { current = target; clearInterval(timer); }
-      el.textContent = current + '+';
-    }, 30);
-  }
-  const statsObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        animateCounter('stat1', 15);
-        animateCounter('stat2', 1);
-        animateCounter('stat3', 50);
-        animateCounter('stat4', 70);
-        statsObserver.disconnect();
-      }
-    });
-  }, { threshold: 0.3 });
-  statsObserver.observe(document.querySelector('.stats-bar'));
+  animate();
+</script>
 
-  // ── FILTER ───────────────────────────────────────────
+<script>
   function filterProjects(cat, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.project-card').forEach(card => {
-      const show = cat === 'all' || card.dataset.cat === cat;
-      card.classList.toggle('hidden', !show);
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'block' : 'none';
     });
   }
 
-  // ── VIDEO MODAL ──────────────────────────────────────
-  function openVideoModal(title, description, videoUrl) {
-    const modal = document.getElementById('videoModal');
+  function openVideoModal(title, desc, url) {
     document.getElementById('videoTitle').textContent = title;
-    document.getElementById('videoDescription').textContent = description;
-
-    let embedUrl = videoUrl;
-    if (videoUrl.includes('watch?v=')) embedUrl = videoUrl.replace('watch?v=', 'embed/');
-    else if (videoUrl.includes('youtu.be/')) {
-      embedUrl = 'https://www.youtube.com/embed/' + videoUrl.split('youtu.be/')[1];
-    }
-
-    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
-    document.getElementById('videoContainer').innerHTML = isYouTube
-      ? `<iframe src="${embedUrl}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
-      : `<video controls autoplay><source src="${videoUrl}" type="video/mp4"></video>`;
-
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.getElementById('videoContainer').innerHTML = `<iframe src="${url}?autoplay=1" allowfullscreen></iframe>`;
+    document.getElementById('videoModal').classList.add('active');
   }
-
   function closeVideoModal() {
     document.getElementById('videoModal').classList.remove('active');
-    document.body.style.overflow = '';
-    setTimeout(() => { document.getElementById('videoContainer').innerHTML = ''; }, 300);
-  }
-
-  function closeVideoModalOnBackdrop(e) {
-    if (e.target === e.currentTarget) closeVideoModal();
-  }
-
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
-
-  // ── FORM ─────────────────────────────────────────────
-  function showStatus(type, message) {
-    const div = document.getElementById('formStatus');
-    div.className = 'form-status ' + type;
-    document.getElementById('formStatusText').textContent = message;
+    document.getElementById('videoContainer').innerHTML = '';
   }
 
   async function submitToGoogleSheets(e) {
     e.preventDefault();
-    const form = document.getElementById('contactForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const spinner = document.getElementById('formSpinner');
-    const statusDiv = document.getElementById('formStatus');
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
 
-    const name = document.getElementById('formName').value.trim();
-    const email = document.getElementById('formEmail').value.trim();
-    const projectType = document.getElementById('formProjectType').value.trim();
-    const message = document.getElementById('formMessage').value.trim();
-
-    if (!name || !email || !message) {
-      showStatus('error', 'Please fill in all required fields.');
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-    spinner.style.display = 'block';
-    showStatus('loading', 'Sending your message...');
+    const formData = new URLSearchParams();
+    formData.append('name', document.getElementById('formName').value);
+    formData.append('email', document.getElementById('formEmail').value);
+    formData.append('message', document.getElementById('formMessage').value);
 
     try {
-      const params = new URLSearchParams();
-      params.append('name', name);
-      params.append('email', email);
-      params.append('projectType', projectType);
-      params.append('message', message);
-      params.append('timestamp', new Date().toISOString());
-      params.append('source', 'Website Contact Form');
-
-      await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+      await fetch('https://script.google.com/macros/s/AKfycbx1bbphT9EwJdWqPlrC4TgpBxEgkk2vHKQoBZ78FG_Ww-rjCSecmeOTbk85vuH73kyX/exec', {
+        method: 'POST', mode: 'no-cors', body: formData
       });
-
-      showStatus('success', '✅ Message sent! We\'ll get back to you within 24 hours.');
-      form.reset();
-      setTimeout(() => { statusDiv.className = 'form-status'; }, 6000);
-
+      alert('✅ Message Sent Successfully!');
+      e.target.reset();
     } catch (err) {
-      console.error(err);
-      showStatus('error', '❌ Something went wrong. Please email us directly.');
+      alert('❌ Error sending message.');
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Message 🚀';
-      spinner.style.display = 'none';
+      btn.textContent = 'Send Message 🚀';
+      btn.disabled = false;
     }
   }
 </script>
